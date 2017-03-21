@@ -1,0 +1,40 @@
+---
+# Docker
+
+- name: Docker yum repository
+  template: src=docker.repo dest=/etc/yum.repos.d/docker.repo mode=0644
+
+- name: make sure docker from distro is not installed
+  yum:
+    name: docker
+    state: absent
+
+- name: install docker
+  yum:
+    name: docker-engine-1.13.1-1.el7.centos
+    state: present
+
+- name: install selinux
+  yum:
+    name: docker-engine-selinux-1.13.1-1.el7.centos
+    state: present
+
+- name: Install docker-py
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - python-docker-py
+
+- name: making sure pip installed
+  shell: curl -sSL https://bootstrap.pypa.io/get-pip.py | python
+
+- name: Docker yum repository
+  template: src=execstart.conf dest=/etc/systemd/system/docker.service.d/execstart.conf mode=0644
+
+- name: reload systemd
+  shell: systemctl daemon-reload
+
+- name: start docker
+  service: name=docker state=started enabled=yes
+

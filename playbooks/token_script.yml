@@ -1,0 +1,7 @@
+---
+- name: execute token script.
+  hosts: localhost
+  tasks:
+     - name: Execute the script
+       command: sh /home/dereck/Documents/work/ansible-playbooks/ansible-kubernetes/generate_token.sh
+

@@ -1,0 +1,11 @@
+---
+- name: k8smaster
+  hosts: k8smaster
+  become: true
+  vars:
+      k8smaster_ipaddr: 10.0.1.254
+      k8s_token: xxxx
+  roles:
+      - role: docker
+      - role: k8s
+      - role: k8smaster

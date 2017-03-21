@@ -1,0 +1,28 @@
+---
+# Master Kubernetes
+
+- name: Initialize master kubernete  
+  command: kubeadm init --token {{ k8s_token  }} --api-advertise-addresses={{ k8smaster_ipaddr  }}
+  register: init_log
+  args: 
+    creates: /etc/kubernetes/pki
+
+- debug:
+    var: init_log.stdout_lines
+
+# Verify weave-kube exists
+- name: Verify weave-kube
+  command: bash -c "kubectl get pods --all-namespaces"
+  ignore_errors: True
+  register: verify_weave
+
+
+# Install weave-net only once
+- name: download  weave-net file
+  get_url:
+    url:  https://git.io/weave-kube
+    dest: /tmp/weave-kube
+
+- name: Applying weave-kube
+  command: kubectl create -f /tmp/weave-kube
+  when: verify_weave.stdout.find('weave') == -1

@@ -1,0 +1,35 @@
+---
+# Kubernetes
+
+- name: Kubernetes yum repository
+  template: src=kubernetes.repo dest=/etc/yum.repos.d/kubernetes.repo mode=0644
+
+- include_vars: token.yml
+
+- name: Disable SELinux
+  command: setenforce 0
+  become: true
+
+# Disabling SELinux
+- yum: name={{ item }} state=present enablerepo=kubernetes 
+  with_items:
+      - libselinux-python
+
+- name: "Disabling SELinux" 
+  selinux:
+    state: disabled
+        
+- name: Install Kubernetes
+  yum: name={{ item }} state=present enablerepo=kubernetes 
+  with_items:
+      - kubelet
+      - kubeadm
+      - kubectl
+      - kubernetes-cni
+        #notify: start kubelet
+
+# TODO: For some reason handlers from handlers/main.yml
+# are not being accesible, so copy/paste-ing here.
+
+- name: start kubelet
+  service: name=kubelet state=started enabled=yes

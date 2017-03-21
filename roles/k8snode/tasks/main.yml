@@ -1,0 +1,14 @@
+---
+# Node kubernetes
+#
+
+- stat: path=/etc/kubernetes/kubelet.conf
+  register: kubelet_conf_file
+
+- name: Join node to the cluster
+  command: kubeadm join --token {{ k8s_token }} {{ k8smaster_ipaddr  }}
+  register: node_join_log
+  when: kubelet_conf_file.stat.exists == False
+
+- debug:
+    var: node_join_log.stdout_lines
